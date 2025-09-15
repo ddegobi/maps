@@ -34,7 +34,7 @@ func _process(delta: float) -> void:
 	visible_bottom_right = chunk_layer.local_to_map(chunk_layer.to_local(camera.get_screen_center_position() + camera.get_viewport_rect().size / 2))
 	visible_top_right = Vector2i(visible_bottom_right.x, visible_top_left.y)
 	visible_bottom_left = Vector2i(visible_top_left.x, visible_bottom_right.y)
-	print(visible_top_left)
+	#print(visible_top_left)
 	var chunks
 	#print("printing mov: ", mov)
 	# checks if there is movement
@@ -59,7 +59,7 @@ func _process(delta: float) -> void:
 			else:
 				chunks.append_array(list_of_vectors2i(visible_top_left, visible_bottom_left))
 		call_for_draw(chunks)
-		print(chunks)
+		#print(chunks)
 	old_pos = pos
 
 ## returns a list of all the possible vector inbetween min and max

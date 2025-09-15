@@ -47,11 +47,6 @@ func _ready() -> void:
 			# print("is chunk generated? ", is_chunk_gen(Vector2i(i,j)))
 	# print("is chunk generated? ", is_chunk_gen(Vector2i(-1,-1)))
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-
 ## simple function that automatically create the tiles in the atlas
 func create_tiles(atlas : TileSetAtlasSource) -> void:
 	var atlas_size = atlas.get_atlas_grid_size()
@@ -70,10 +65,12 @@ func is_chunk_gen(chunk_coord) -> bool:
 
 ## Draws the passed chunk onto the tilemap
 func draw_chunk(chunk_coord : Vector2i) -> void:
+	var verbose = false
 	# get_coords_from_chunk(chunk_coord,HeightChunk.CHUNK_SIZE,0,0)
 	# is_chunk_gen(chunk_coord)
 	if( !is_chunk_gen(chunk_coord) ):
-		print("Generating chunk: ", chunk_coord.x,", " ,chunk_coord.y)
+		if verbose:
+			print("Generating chunk: ", chunk_coord.x,", " ,chunk_coord.y)
 		var height_chunk = map_generator.generate_chunk_at_coord(chunk_coord)
 		var tile_data : TileData
 		for i in HeightChunk.CHUNK_SIZE.x:
