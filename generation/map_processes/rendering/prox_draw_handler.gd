@@ -1,7 +1,7 @@
 @icon("res://interface/icon/draw_handler.png")
 class_name ProxDrawHandler extends DrawHandler
 
-const MAX_DISTANCE : int = 3
+const MAX_DISTANCE : int = 4
 
 # if im making a loaded_chunks we need a way to periodically pop from stack
 var loaded_chunks
@@ -28,7 +28,6 @@ func find_positions() -> void:
 func init_chunk_queue() -> void:
 	find_positions()
 	chunk_queue.append(ChunkPos.new(Vector2i(0,0), 0))
-	chunk_queue.append(ChunkPos.new(Vector2i(1,0), 0))
 	pass
 	
 func look_for_chunks() -> void:
@@ -41,16 +40,64 @@ func look_for_chunks() -> void:
 				var curr_chunk = Vector2i(i,j)
 				add_to_chunk_queue(ChunkPos.new(curr_chunk, curr_chunk.distance_to(pos)))
 
-func sort_by_distance(a : ChunkPos, b : ChunkPos):
+func sort_by_distance(a : ChunkPos, b : ChunkPos) -> bool:
 	return a.dist < b.dist
+
+func sort_by_x(a : ChunkPos, b : ChunkPos) -> bool:
+	return a.pos.x < b.pos.x
+
+func sort_by_y(a : ChunkPos, b : ChunkPos) -> bool:
+	return a.pos.y < b.pos.y
 
 func add_to_chunk_queue(chunk : ChunkPos) -> void:
 	print_rich("[color=RED]count is ",chunk_queue.size())
-	idx_cq = chunk_queue.bsearch_custom(chunk, sort_by_distance, false)
+	idx_cq = chunk_queue.bsearch_custom(chunk, sort_by_distance, true)
+	print_rich("[color=YELLOW]index is ", idx_cq)
+	print(chunk_queue)
 	print(chunk, " == ", chunk_queue[idx_cq-1])
-	if true:
+	if is_forward_equal_recursive(idx_cq, chunk):
 		chunk_queue.insert(idx_cq, chunk)
 		print("inserted chunk: %s" % [chunk])
 
+# not an elegant solution to the unstable sort problem (god damn godot)
+"""
+func is_behind_equal_recursive(index : int) -> bool:
+	if index-1 < 0:
+		return false
+	else:
+		if chunk_queue[index].equals(chunk_queue[index-1]):
+			return true
+		else:
+			if chunk_queue[index].dist == chunk_queue[index-1].dist:
+				return is_behind_equal_recursive(index-1)
+			else:
+				return false
+"""
+"""
+func is_forward_equal_recursive(index : int) -> bool:
+	if chunk_queue[index].dist == chunk_queue[index+1].dist:
+		if chunk_queue[index].equals(chunk_queue[index+1]):
+			return true
+		else:
+			if index+1 != chunk_queue.size():
+				return is_forward_equal_recursive(index-1)
+			else:
+				return false
+	else:
+		return false
+		
+		"""
+		
+func is_forward_equal_recursive(index : int, chunk : ChunkPos) -> bool:
+	if index < chunk_queue.size():
+		if chunk_queue[index].dist == chunk.dist:
+			if chunk_queue[index].equals(chunk):
+				return false
+			else:
+				return is_forward_equal_recursive(index+1, chunk)
+		else:
+			return true
+	else:
+		return true
 func add_to_loaded_chunks() -> void:
 	pass
