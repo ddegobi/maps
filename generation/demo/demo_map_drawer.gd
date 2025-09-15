@@ -60,7 +60,7 @@ func get_coords_from_chunk(chunk_coord : Vector2i,
 			pos_y : int) -> Vector2i:
 	return Vector2i((chunk_coord.x*chunk_size.x)+pos_x, (chunk_coord.y*chunk_size.y)+pos_y)
 
-func is_chunk_gen(chunk_coord) -> bool:
+func is_chunk_gen(chunk_coord : Vector2i) -> bool:
 	return get_cell_tile_data( get_coords_from_chunk(chunk_coord,HeightChunk.CHUNK_SIZE,0,0)) != null
 
 ## Draws the passed chunk onto the tilemap

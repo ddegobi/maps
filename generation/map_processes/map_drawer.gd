@@ -14,3 +14,6 @@ func _process(delta: float) -> void:
 ## Girl whatever dasdasdas
 func draw_chunk(chunk_coord : Vector2i) -> void:
 	pass
+
+func is_chunk_gen(chunk_coord : Vector2i) -> bool:
+	return false
