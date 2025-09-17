@@ -17,7 +17,6 @@ const HEIGHT_MAP_LAYER = "height_map_layer"
 var main_source_id = null
 ## [MapGenerator] object that is going to be utilized by drawer
 var map_generator : MapGenerator
-var height_data = 0
 
 # Constructor
 func _init(tileset_texture : Texture2D, generator : MapGenerator) -> void:
@@ -38,14 +37,6 @@ func _init(tileset_texture : Texture2D, generator : MapGenerator) -> void:
 
 	set_tile_set(ts)
 
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	# test
-	for i in range(10):
-		for j in range(10):
-			draw_chunk(Vector2i(i,j))
-			# print("is chunk generated? ", is_chunk_gen(Vector2i(i,j)))
-	# print("is chunk generated? ", is_chunk_gen(Vector2i(-1,-1)))
 
 ## simple function that automatically create the tiles in the atlas
 func create_tiles(atlas : TileSetAtlasSource) -> void:
@@ -61,30 +52,39 @@ func get_coords_from_chunk(chunk_coord : Vector2i,
 	return Vector2i((chunk_coord.x*chunk_size.x)+pos_x, (chunk_coord.y*chunk_size.y)+pos_y)
 
 func is_chunk_gen(chunk_coord : Vector2i) -> bool:
-	return get_cell_tile_data( get_coords_from_chunk(chunk_coord,HeightChunk.CHUNK_SIZE,0,0)) != null
+	return get_node(str(get_path(),"/%s_%s" % [str(chunk_coord.x), str(chunk_coord.y)])) != null
+	
+
+func _create_chunk_tilemap(chunk_coord) -> TileMapLayer:
+	var chunk = ChunkDrawer.new(chunk_coord)
+	chunk.name = "%s_%s" % [str(chunk_coord.x), str(chunk_coord.y)]
+	chunk.set_tile_set(tile_set)
+	return chunk
+
+func _paint_chunk(chunk : ChunkDrawer) -> void:
+	var height_chunk = map_generator.generate_chunk_at_coord(chunk.chunk_coord)
+	var tile_data : TileData
+	for i in HeightChunk.CHUNK_SIZE.x:
+		for j in HeightChunk.CHUNK_SIZE.y:
+			var height_data = height_chunk.grid[i][j]
+			if height_data < 0:
+				chunk.set_cell(get_coords_from_chunk(chunk.chunk_coord,HeightChunk.CHUNK_SIZE,i,j),
+						 main_source_id,
+						 DEFAULT_TILE)
+			else:
+				chunk.set_cell(get_coords_from_chunk(chunk.chunk_coord,HeightChunk.CHUNK_SIZE,i,j),
+						 main_source_id,
+						 SECOND_TILE)
+			tile_data = chunk.get_cell_tile_data(
+					Vector2i((chunk.chunk_coord.x*HeightChunk.CHUNK_SIZE.x)+i,
+					(chunk.chunk_coord.y*HeightChunk.CHUNK_SIZE.y)+j)
+					)
+			tile_data.set_custom_data(HEIGHT_MAP_LAYER, height_data)
 
 ## Draws the passed chunk onto the tilemap
 func draw_chunk(chunk_coord : Vector2i) -> void:
-	var verbose = false
-	# get_coords_from_chunk(chunk_coord,HeightChunk.CHUNK_SIZE,0,0)
-	# is_chunk_gen(chunk_coord)
-	if( !is_chunk_gen(chunk_coord) ):
-		if verbose:
-			print("Generating chunk: ", chunk_coord.x,", " ,chunk_coord.y)
-		var height_chunk = map_generator.generate_chunk_at_coord(chunk_coord)
-		var tile_data : TileData
-		for i in HeightChunk.CHUNK_SIZE.x:
-			for j in HeightChunk.CHUNK_SIZE.y:
-				height_data = height_chunk.grid[i][j]
-				if height_data < 0:
-					set_cell(get_coords_from_chunk(chunk_coord,HeightChunk.CHUNK_SIZE,i,j),
-							 main_source_id,
-							 DEFAULT_TILE)
-				else:
-					set_cell(get_coords_from_chunk(chunk_coord,HeightChunk.CHUNK_SIZE,i,j),
-							 main_source_id,
-							 SECOND_TILE)
-							
-				tile_data = get_cell_tile_data(Vector2i((chunk_coord.x*HeightChunk.CHUNK_SIZE.x)+i,
-														(chunk_coord.y*HeightChunk.CHUNK_SIZE.y)+j))
-				tile_data.set_custom_data(HEIGHT_MAP_LAYER, height_data)
+	
+	if( not is_chunk_gen(chunk_coord) ):
+		var chunk = _create_chunk_tilemap(chunk_coord)
+		_paint_chunk(chunk)
+		add_child(chunk)

@@ -12,10 +12,13 @@ func _init(d_layer : MapDrawer, c_layer : TileMapLayer) -> void:
 	chunk_layer = c_layer
 	
 func _ready() -> void:
-	init_timer()
+	_init_timer()
+	start_chunk_gen()
+	
+func start_chunk_gen() -> void:
 	chunk_check_timer.start()
 	
-func init_timer() -> void:
+func _init_timer() -> void:
 	add_child(chunk_check_timer)
 	chunk_check_timer.wait_time = chunk_check_delay
 	chunk_check_timer.one_shot = false

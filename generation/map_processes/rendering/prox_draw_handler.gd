@@ -43,7 +43,7 @@ func look_for_chunks() -> void:
 			add_to_chunk_queue(ChunkPos.new(curr_chunk, curr_chunk.distance_to(pos)))
 
 func sort_by_distance(a : ChunkPos, b : ChunkPos) -> bool:
-	return a.dist < b.dist
+	return a.dist > b.dist
 
 # if godot had a stable sort algorithm i wouldn't have to implement this
 ## given the index to the first element of a sequence of chunks with the same
