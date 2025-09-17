@@ -52,7 +52,7 @@ func get_coords_from_chunk(chunk_coord : Vector2i,
 	return Vector2i((chunk_coord.x*chunk_size.x)+pos_x, (chunk_coord.y*chunk_size.y)+pos_y)
 
 func is_chunk_gen(chunk_coord : Vector2i) -> bool:
-	return get_node(str(get_path(),"/%s_%s" % [str(chunk_coord.x), str(chunk_coord.y)])) != null
+	return get_node_or_null("%s_%s" % [str(chunk_coord.x), str(chunk_coord.y)]) != null
 	
 
 func _create_chunk_tilemap(chunk_coord) -> TileMapLayer:
