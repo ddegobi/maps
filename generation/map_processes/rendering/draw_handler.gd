@@ -2,7 +2,7 @@
 class_name DrawHandler extends Node
 
 @export_range(0, 1, 0.05, "suffix:s", "or_greater")
-var chunk_check_delay : float = 1.0
+var chunk_check_delay : float = 0.1
 var chunk_check_timer = Timer.new()
 var draw_layer : MapDrawer
 var chunk_layer : TileMapLayer

@@ -37,7 +37,6 @@ func _init(tileset_texture : Texture2D, generator : MapGenerator) -> void:
 
 	set_tile_set(ts)
 
-
 ## simple function that automatically create the tiles in the atlas
 func create_tiles(atlas : TileSetAtlasSource) -> void:
 	var atlas_size = atlas.get_atlas_grid_size()
@@ -79,12 +78,27 @@ func _paint_chunk(chunk : ChunkDrawer) -> void:
 					Vector2i((chunk.chunk_coord.x*HeightChunk.CHUNK_SIZE.x)+i,
 					(chunk.chunk_coord.y*HeightChunk.CHUNK_SIZE.y)+j)
 					)
-			tile_data.set_custom_data(HEIGHT_MAP_LAYER, height_data)
-
+			tile_data.call_deferred("set_custom_data",HEIGHT_MAP_LAYER, height_data)
+			
 ## Draws the passed chunk onto the tilemap
 func draw_chunk(chunk_coord : Vector2i) -> void:
 	
 	if( not is_chunk_gen(chunk_coord) ):
+		"""
 		var chunk = _create_chunk_tilemap(chunk_coord)
 		_paint_chunk(chunk)
 		add_child(chunk)
+		"""
+		var thread = Thread.new()
+		thread.start(_bg_chunk_load.bind(chunk_coord, thread))
+	
+
+func _bg_chunk_load(chunk_coord : Vector2i, thread : Thread):
+	var chunk = _create_chunk_tilemap(chunk_coord)
+	_paint_chunk(chunk)
+	call_deferred("_bg_chunk_load_done", thread)
+	return chunk
+
+func _bg_chunk_load_done(thread : Thread) -> void:
+	var chunk = thread.wait_to_finish()
+	add_child(chunk)

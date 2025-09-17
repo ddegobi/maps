@@ -1,7 +1,7 @@
 @icon("res://interface/icon/draw_handler.png")
 class_name ProxDrawHandler extends DrawHandler
 
-const MAX_DISTANCE : int = 6
+const MAX_DISTANCE : int = 10
 
 # if im making a loaded_chunks we need a way to periodically pop from stack
 var loaded_chunks = {}
@@ -29,9 +29,9 @@ func _init(d_layer : MapDrawer, c_layer : TileMapLayer, curr_player : CharacterB
 	init_chunk_queue()
 
 func _process(delta: float) -> void:
-	var popped_chunk = chunk_queue.pop_back()
-	if popped_chunk:
+	for popped_chunk in chunk_queue:
 		draw_layer.draw_chunk(popped_chunk.pos)
+	chunk_queue.clear
 
 ## looks for chunk that need loading near the player
 func look_for_chunks() -> void:
