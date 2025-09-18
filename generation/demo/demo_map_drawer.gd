@@ -74,11 +74,11 @@ func _paint_chunk(chunk : ChunkDrawer) -> void:
 				chunk.set_cell(get_coords_from_chunk(chunk.chunk_coord,HeightChunk.CHUNK_SIZE,i,j),
 						 main_source_id,
 						 SECOND_TILE)
-			tile_data = chunk.get_cell_tile_data(
+			"""tile_data = chunk.get_cell_tile_data(
 					Vector2i((chunk.chunk_coord.x*HeightChunk.CHUNK_SIZE.x)+i,
 					(chunk.chunk_coord.y*HeightChunk.CHUNK_SIZE.y)+j)
 					)
-			tile_data.call_deferred("set_custom_data",HEIGHT_MAP_LAYER, height_data)
+			tile_data.call_deferred("set_custom_data",HEIGHT_MAP_LAYER, height_data)"""
 			
 ## Draws the passed chunk onto the tilemap
 func draw_chunk(chunk_coord : Vector2i) -> void:

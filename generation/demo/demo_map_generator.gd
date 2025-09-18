@@ -2,21 +2,17 @@
 class_name DemoMapGenerator extends MapGenerator
 
 var noise = FastNoiseLite.new()
+var base = HeightChunk.new()
 
 func _init(seed_int) -> void:
 	noise.noise_type = FastNoiseLite.NoiseType.TYPE_SIMPLEX_SMOOTH
 	noise.seed = seed_int
 	noise.fractal_octaves = 4
 	noise.frequency = 1.0 / 4.0
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+	
+	for i in HeightChunk.CHUNK_SIZE.x:
+		for j in HeightChunk.CHUNK_SIZE.y:
+			base.grid[i][j] = 0
 
 ## generates a heightmap using the simplex algorithm. it returns a [HeightChunk]
 ## object containing the heights.

@@ -20,3 +20,6 @@ func _process(delta: float) -> void:
 ## chunk.
 func generate_chunk_at_coord(chunk_coord: Vector2i) -> HeightChunk:
 	return null
+
+func generate_height_tile_at_coord(tile_coord: Vector2i) -> int:
+	return 0
