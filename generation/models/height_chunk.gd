@@ -6,7 +6,7 @@ static var BIT_32_RANGE : int = 4294967296
 var grid = []
 
 func _init() -> void:
-	for i in CHUNK_SIZE.x:
+	for i in CHUNK_SIZE.x + 2:
 		grid.append(PackedInt32Array())
-		for j in CHUNK_SIZE.y:
+		for j in CHUNK_SIZE.y + 2:
 			grid[i].append(0)

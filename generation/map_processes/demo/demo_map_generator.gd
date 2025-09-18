@@ -18,12 +18,12 @@ func _init(seed_int) -> void:
 ## object containing the heights.
 func generate_chunk_at_coord(chunk_coord: Vector2i) -> HeightChunk:
 	var height_chunk = HeightChunk.new()
-	for i in height_chunk.CHUNK_SIZE.x:
-		for j in height_chunk.CHUNK_SIZE.y:
+	for i in height_chunk.CHUNK_SIZE.x + 2:
+		for j in height_chunk.CHUNK_SIZE.y + 2:
 			#print("noise at xy: ", noise.get_noise_2d(chunk_coord.x + (1/float(HeightChunk.CHUNK_SIZE.x ))*i, chunk_coord.y + (1/float(HeightChunk.CHUNK_SIZE.y))*j)  )
 			#print("height at xy: ", int( noise.get_noise_2d(chunk_coord.x + (1/float(HeightChunk.CHUNK_SIZE.x ))*i, chunk_coord.y + (1/float(HeightChunk.CHUNK_SIZE.y))*j) * height_chunk.BIT_32_RANGE - (height_chunk.BIT_32_RANGE/2) ) )
 			#print("x: ", float(chunk_coord.x) + (1/(i+1)), " y: ", (float(chunk_coord.y) + (1/(j+1))))
 			#print(noise.get_noise_2d( (chunk_coord.x + (1/(i+1))), (chunk_coord.y + (1/(j+1)))))
-			height_chunk.grid[i][j] = int( noise.get_noise_2d(chunk_coord.x + (1/float(HeightChunk.CHUNK_SIZE.x ))*i, chunk_coord.y + (1/float(HeightChunk.CHUNK_SIZE.y))*j) * height_chunk.BIT_32_RANGE - (height_chunk.BIT_32_RANGE/2) )
+			height_chunk.grid[i][j] = int( noise.get_noise_2d(chunk_coord.x + (1/float(HeightChunk.CHUNK_SIZE.x ))*i-1, chunk_coord.y + (1/float(HeightChunk.CHUNK_SIZE.y))*j-1) * height_chunk.BIT_32_RANGE - (height_chunk.BIT_32_RANGE/2) )
 	# print(height_chunk.grid)
 	return height_chunk

@@ -28,10 +28,32 @@ const FULL = Vector2i(1,1)
 const FULL_ALT = Vector2i(5,0)
 # alternative tiles ids
 enum alt_tiles {
-	NORMAL,
-	FLIP_H,
-	FLIP_V,
-	FLIP_HV,
+	NORMAL = 1,
+	FLIP_H = 2,
+	FLIP_V = 3,
+	FLIP_HV = 4,
+}
+enum cell_types {
+	GRASS,
+	WATER,
+}
+var atlas_coord_map = {
+	"0000" : FULL,
+	"0001" : OUTER_BOTTOM,
+	"0010" : OUTER_RIGHT,
+	"0011" : OUTER_BOTTOM_RIGHT,
+	"0100" : OUTER_LEFT,
+	"0101" : OUTER_BOTTOM_LEFT,
+	"0110" : FULL_ALT, # TODO MAPPING!
+	"0111" : FULL_ALT, # TODO MAPPING!
+	"1000" : OUTER_TOP,
+	"1001" : FULL_ALT, # TODO MAPPING!
+	"1010" : OUTER_TOP_RIGHT,
+	"1011" : FULL_ALT, # TODO MAPPING!
+	"1100" : OUTER_TOP_LEFT,
+	"1101" : FULL_ALT, # TODO MAPPING!
+	"1110" : FULL_ALT, # TODO MAPPING!
+	"1111" : FULL_ALT,
 }
 
 # ids of different atlases atlas ###############################################
@@ -56,6 +78,10 @@ func _init(default_tileset_texture : Texture2D, generator : MapGenerator) -> voi
 	print(grass_to_water_id)
 	
 	set_tile_set(ts)
+
+func _init_atlas_coord_map() -> void:
+	
+	pass
 
 func create_atlas(texture) -> TileSetAtlasSource:
 	var ts_source : TileSetAtlasSource = TileSetAtlasSource.new()
@@ -88,6 +114,8 @@ func create_tiles(atlas : TileSetAtlasSource) -> void:
 	atlas.get_tile_data(FULL, alt_tiles.FLIP_HV).flip_v = true
 	atlas.get_tile_data(FULL, alt_tiles.FLIP_HV).flip_h = true
 
+
+
 func get_coords_from_chunk(chunk_coord : Vector2i,
 			chunk_size : Vector2i, 
 			pos_x : int, 
@@ -106,26 +134,52 @@ func _create_chunk_tilemap(chunk_coord) -> TileMapLayer:
 
 func _paint_chunk(chunk : ChunkDrawer) -> void:
 	var height_chunk = map_generator.generate_chunk_at_coord(chunk.chunk_coord)
+	var type_chunk = []
 	var tile_data : TileData
-	for i in HeightChunk.CHUNK_SIZE.x:
-		for j in HeightChunk.CHUNK_SIZE.y:
-			var coord = get_coords_from_chunk(chunk.chunk_coord,HeightChunk.CHUNK_SIZE,i,j)
+	
+	for i in HeightChunk.CHUNK_SIZE.x + 2:
+		type_chunk.append([])
+		for j in HeightChunk.CHUNK_SIZE.y + 2:
 			var height_data = height_chunk.grid[i][j]
 			if height_data < 0:
+				type_chunk[i].append(cell_types.WATER)
+			else:
+				type_chunk[i].append(cell_types.GRASS)
+	
+	for i in range(1, HeightChunk.CHUNK_SIZE.x+1):
+		for j in range(1, HeightChunk.CHUNK_SIZE.y+1):
+			var coord = get_coords_from_chunk(chunk.chunk_coord,HeightChunk.CHUNK_SIZE,i,j)
+			#var height_data = height_chunk.grid[i][j]
+			if type_chunk[i][j] == cell_types.WATER:
 				chunk.set_cell(coord, grass_to_water_id, FULL_ALT)
 			else:
+				var mini_matrix = type_chunk.slice(i-1, i+2)
+				for row in range(3):
+					mini_matrix[row] = mini_matrix[row].slice(j-1, j+2)
+				var atlas_coords = _determine_atlas_coord(cell_types.GRASS, cell_types.WATER, mini_matrix)
 				var alt_tile = randi() % alt_tiles.size()
-				chunk.set_cell(coord, grass_to_water_id, FULL, alt_tile)
-			
+				if atlas_coords == FULL:
+					chunk.set_cell(coord, grass_to_water_id, atlas_coords, alt_tile)
+				else:
+					chunk.set_cell(coord, grass_to_water_id, atlas_coords)
+					
+
+func _determine_atlas_coord(type, alt_type, mini_matrix) -> Vector2i:
+	var str : String
+	var m = []
+	for i in mini_matrix.size():
+		m.append([])
+		for j in mini_matrix.size():
+			if mini_matrix[i][j] == type:
+				m[i].append(0)
+			else:
+				m[i].append(1)
+	str = str(m[1][0],m[0][1],m[2][1],m[1][2])
+	return atlas_coord_map[str]
+	
 ## Draws the passed chunk onto the tilemap
 func draw_chunk(chunk_coord : Vector2i) -> void:
-	
 	if( not is_chunk_gen(chunk_coord) ):
-		"""
-		var chunk = _create_chunk_tilemap(chunk_coord)
-		_paint_chunk(chunk)
-		add_child(chunk)
-		"""
 		var thread = Thread.new()
 		thread.start(_bg_chunk_load.bind(chunk_coord, thread))
 	
