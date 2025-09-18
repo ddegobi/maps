@@ -2,6 +2,7 @@
 class_name ProxDrawHandler extends DrawHandler
 
 const MAX_DISTANCE : int = 10
+const NUMBER_OF_CHUNKS_DRAWN : int = 3
 
 # if im making a loaded_chunks we need a way to periodically pop from stack
 var loaded_chunks = {}
@@ -29,9 +30,10 @@ func _init(d_layer : MapDrawer, c_layer : TileMapLayer, curr_player : CharacterB
 	init_chunk_queue()
 
 func _process(delta: float) -> void:
-	for popped_chunk in chunk_queue:
-		draw_layer.draw_chunk(popped_chunk.pos)
-	chunk_queue.clear
+	if chunk_queue.size() > NUMBER_OF_CHUNKS_DRAWN:
+		for popped_chunk in chunk_queue.slice(-NUMBER_OF_CHUNKS_DRAWN,-1):
+			draw_layer.draw_chunk(popped_chunk.pos)
+		chunk_queue.resize(chunk_queue.size()-NUMBER_OF_CHUNKS_DRAWN)
 
 ## looks for chunk that need loading near the player
 func look_for_chunks() -> void:
@@ -43,7 +45,7 @@ func look_for_chunks() -> void:
 			add_to_chunk_queue(ChunkPos.new(curr_chunk, curr_chunk.distance_to(pos)))
 
 func sort_by_distance(a : ChunkPos, b : ChunkPos) -> bool:
-	return a.dist > b.dist
+	return a.dist < b.dist
 
 # if godot had a stable sort algorithm i wouldn't have to implement this
 ## given the index to the first element of a sequence of chunks with the same
