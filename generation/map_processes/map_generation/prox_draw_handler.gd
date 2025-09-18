@@ -32,7 +32,7 @@ func _init(d_layer : MapDrawer,
 	player = curr_player
 	init_chunk_queue()
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if chunk_queue.size() > NUMBER_OF_CHUNKS_DRAWN:
 		for popped_chunk in chunk_queue.slice(-NUMBER_OF_CHUNKS_DRAWN,-1):
 			draw_layer.draw_chunk(popped_chunk.pos)
@@ -42,10 +42,10 @@ func _process(delta: float) -> void:
 func look_for_chunks() -> void:
 	find_positions()
 	print_rich("[color=FOREST_GREEN]##########################", pos_in_chunk_layer)
-	for i in range(pos_in_chunk_layer.x - MAX_DISTANCE/2,
-				   pos_in_chunk_layer.x + MAX_DISTANCE/2):
-		for j in range(pos_in_chunk_layer.y - MAX_DISTANCE/2,
-					   pos_in_chunk_layer.y + MAX_DISTANCE/2):
+	for i in range(pos_in_chunk_layer.x - int(float(MAX_DISTANCE)/2),
+				   pos_in_chunk_layer.x + int(float(MAX_DISTANCE)/2) ):
+		for j in range(pos_in_chunk_layer.y - int(float(MAX_DISTANCE)/2),
+					   pos_in_chunk_layer.y + int(float(MAX_DISTANCE)/2) ):
 			var curr_chunk = Vector2i(i,j)
 			add_to_chunk_queue(ChunkPos.new(curr_chunk, curr_chunk.distance_to(pos)))
 

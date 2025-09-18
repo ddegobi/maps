@@ -79,8 +79,7 @@ func _init(default_tileset_texture : Texture2D, generator : MapGenerator) -> voi
 	
 	set_tile_set(ts)
 
-func _init_atlas_coord_map() -> void:
-	
+func _init_atlas_coord_map() -> void:	
 	pass
 
 func create_atlas(texture) -> TileSetAtlasSource:
@@ -135,7 +134,6 @@ func _create_chunk_tilemap(chunk_coord) -> TileMapLayer:
 func _paint_chunk(chunk : ChunkDrawer) -> void:
 	var height_chunk = map_generator.generate_chunk_at_coord(chunk.chunk_coord)
 	var type_chunk = []
-	var tile_data : TileData
 	
 	for i in HeightChunk.CHUNK_SIZE.x + 2:
 		type_chunk.append([])
@@ -156,7 +154,7 @@ func _paint_chunk(chunk : ChunkDrawer) -> void:
 				var mini_matrix = type_chunk.slice(i-1, i+2)
 				for row in range(3):
 					mini_matrix[row] = mini_matrix[row].slice(j-1, j+2)
-				var atlas_coords = _determine_atlas_coord(cell_types.GRASS, cell_types.WATER, mini_matrix)
+				var atlas_coords = _determine_atlas_coord(cell_types.GRASS, mini_matrix)
 				var alt_tile = randi() % alt_tiles.size()
 				if atlas_coords == FULL:
 					chunk.set_cell(coord, grass_to_water_id, atlas_coords, alt_tile)
@@ -164,8 +162,8 @@ func _paint_chunk(chunk : ChunkDrawer) -> void:
 					chunk.set_cell(coord, grass_to_water_id, atlas_coords)
 					
 
-func _determine_atlas_coord(type, alt_type, mini_matrix) -> Vector2i:
-	var str : String
+func _determine_atlas_coord(type, mini_matrix) -> Vector2i:
+	var key_str : String
 	var m = []
 	for i in mini_matrix.size():
 		m.append([])
@@ -174,8 +172,8 @@ func _determine_atlas_coord(type, alt_type, mini_matrix) -> Vector2i:
 				m[i].append(0)
 			else:
 				m[i].append(1)
-	str = str(m[1][0],m[0][1],m[2][1],m[1][2])
-	return atlas_coord_map[str]
+	key_str = str(m[1][0],m[0][1],m[2][1],m[1][2])
+	return atlas_coord_map[key_str]
 	
 ## Draws the passed chunk onto the tilemap
 func draw_chunk(chunk_coord : Vector2i) -> void:

@@ -6,20 +6,8 @@ class_name MapGenerator extends Node
 ## are calculated here, the data is then used by [MapDrawer] to draw the actual
 ## tiles onto the tilemap. 
 
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-
-## Must implement in subclass[br]
-## Generates a [HeightChunk] object, used to determinate the height on a certain
-## chunk.
-func generate_chunk_at_coord(chunk_coord: Vector2i) -> HeightChunk:
+func generate_chunk_at_coord(_chunk_coord: Vector2i) -> HeightChunk:
 	return null
 
-func generate_height_tile_at_coord(tile_coord: Vector2i) -> int:
+func generate_height_tile_at_coord(_tile_coord: Vector2i) -> int:
 	return 0

@@ -11,9 +11,5 @@ func _ready() -> void:
 	layer_holder_node.create_draw_handler()
 	print(layer_holder_node.curr_character)
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-
 func give_character_to_layer_holder() -> void:
 	layer_holder_node.curr_character = curr_character

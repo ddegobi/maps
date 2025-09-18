@@ -1,5 +1,4 @@
 class_name LayerHolder extends Node2D
-@onready var outside_layer: TileMapLayer = $outside_layer
 @onready var main_camera: Camera2D = $"../dummy_character/camera"
 
 const MAIN_SOURCE_ID = 0
@@ -35,10 +34,6 @@ func _ready() -> void:
 	add_child(default_chunk_layer)
 	add_child(default_layer)
 	#add_child(default_draw_handler)
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
 
 func create_draw_handler() -> void:
 	#print("create_draw_handler() called: ")
