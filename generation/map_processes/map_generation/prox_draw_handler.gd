@@ -24,7 +24,10 @@ func init_chunk_queue() -> void:
 	find_positions()
 	chunk_queue.append(ChunkPos.new(Vector2i(0,0), 0))
 
-func _init(d_layer : MapDrawer, c_layer : TileMapLayer, curr_player : CharacterBody2D) -> void:
+func _init(d_layer : MapDrawer, 
+		   c_layer : TileMapLayer, 
+		   curr_player : CharacterBody2D
+		   ) -> void:
 	super(d_layer, c_layer)
 	player = curr_player
 	init_chunk_queue()
@@ -38,9 +41,11 @@ func _process(delta: float) -> void:
 ## looks for chunk that need loading near the player
 func look_for_chunks() -> void:
 	find_positions()
-	print_rich("[color=FOREST_GREEN]############################################################# ", pos_in_chunk_layer)
-	for i in range(pos_in_chunk_layer.x - MAX_DISTANCE/2, pos_in_chunk_layer.x + MAX_DISTANCE/2):
-		for j in range(pos_in_chunk_layer.y - MAX_DISTANCE/2, pos_in_chunk_layer.y + MAX_DISTANCE/2):
+	print_rich("[color=FOREST_GREEN]##########################", pos_in_chunk_layer)
+	for i in range(pos_in_chunk_layer.x - MAX_DISTANCE/2,
+				   pos_in_chunk_layer.x + MAX_DISTANCE/2):
+		for j in range(pos_in_chunk_layer.y - MAX_DISTANCE/2,
+					   pos_in_chunk_layer.y + MAX_DISTANCE/2):
 			var curr_chunk = Vector2i(i,j)
 			add_to_chunk_queue(ChunkPos.new(curr_chunk, curr_chunk.distance_to(pos)))
 
@@ -69,13 +74,14 @@ func add_to_loaded_chunks() -> void:
 func is_chunk_not_generated(chunk : ChunkPos) -> bool:
 	return not draw_layer.is_chunk_gen(chunk.pos)
 
-## adds the [ChunkPos] object to chunk_queue if the element is not already present in it
+## adds the [ChunkPos] object to chunk_queue if the element is not already
+## present in it
 func add_to_chunk_queue(chunk : ChunkPos) -> void:
 	#print_rich("[color=RED]count is ",chunk_queue.size())
 	idx_cq = chunk_queue.bsearch_custom(chunk, sort_by_distance, true)
 	#print_rich("[color=YELLOW]index is ", idx_cq)
 	#print(chunk_queue)
 	#print(chunk, " == ", chunk_queue[idx_cq-1])
-	if is_chunk_not_generated(chunk) and is_forward_equal_recursive(idx_cq, chunk) :
+	if is_chunk_not_generated(chunk) and is_forward_equal_recursive(idx_cq, chunk):
 		chunk_queue.insert(idx_cq, chunk)
 		#print("inserted chunk: %s" % [chunk])

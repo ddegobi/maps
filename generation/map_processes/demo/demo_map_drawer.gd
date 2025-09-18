@@ -8,41 +8,85 @@ class_name DemoMapDrawer extends MapDrawer
 ## 
 ## SingleThreadImplementation
 
-
+#grass_tileset
+const GRASS_TILESET = preload("res://textures/tilesets/grass_tileset.png")
+# tileset size
+const TILESET_SIZE : Vector2i = Vector2i(8,8)
+# position of defualt tiles
 const DEFAULT_TILE : Vector2i = Vector2i(0,0)
 const SECOND_TILE : Vector2i = Vector2i(0,1)
-const HEIGHT_MAP_LAYER = "height_map_layer"
+# positions of tiles in atlas
+const OUTER_TOP_RIGHT = Vector2i(2, 0)
+const OUTER_TOP_LEFT = Vector2i(0, 0)
+const OUTER_BOTTOM_RIGHT = Vector2i(2, 2)
+const OUTER_BOTTOM_LEFT = Vector2i(0, 2)
+const OUTER_BOTTOM = Vector2i(1, 2)
+const OUTER_TOP = Vector2i(1, 0)
+const OUTER_LEFT = Vector2i(0, 1)
+const OUTER_RIGHT = Vector2i(2, 1)
+const FULL = Vector2i(1,1)
+const FULL_ALT = Vector2i(5,0)
+# alternative tiles ids
+enum alt_tiles {
+	NORMAL,
+	FLIP_H,
+	FLIP_V,
+	FLIP_HV,
+}
 
-## id of first atlas added
-var main_source_id = null
+# ids of different atlases atlas ###############################################
+var default_source_id : int
+var grass_to_water_id : int
 ## [MapGenerator] object that is going to be utilized by drawer
 var map_generator : MapGenerator
 
+
 # Constructor
-func _init(tileset_texture : Texture2D, generator : MapGenerator) -> void:
+func _init(default_tileset_texture : Texture2D, generator : MapGenerator) -> void:
 	var ts : TileSet = TileSet.new()
-	var ts_source : TileSetAtlasSource = TileSetAtlasSource.new()
 	
 	map_generator = generator
-	ts.tile_size = Vector2i(8,8)
-	ts_source.texture = tileset_texture
-	ts_source.texture_region_size = Vector2i(8,8)
-	create_tiles(ts_source)
-	main_source_id = ts.add_source(ts_source)
-	ts.add_custom_data_layer()
-	# CUSTOM LAYER "height_map_layer"
-	var height_map_layer_id = ts.get_custom_data_layers_count()-1
-	ts.set_custom_data_layer_name(height_map_layer_id, HEIGHT_MAP_LAYER)
-	ts.set_custom_data_layer_type(height_map_layer_id, TYPE_INT)
-
+	ts.tile_size = TILESET_SIZE
+	
+	# basic_tileset.png ADDED
+	default_source_id = ts.add_source(create_atlas(default_tileset_texture))
+	print(default_source_id)
+	# grass_tileset.png ADDED
+	grass_to_water_id = ts.add_source(create_atlas(GRASS_TILESET))
+	print(grass_to_water_id)
+	
 	set_tile_set(ts)
+
+func create_atlas(texture) -> TileSetAtlasSource:
+	var ts_source : TileSetAtlasSource = TileSetAtlasSource.new()
+	ts_source.texture = texture
+	ts_source.texture_region_size = TILESET_SIZE
+	create_tiles(ts_source)
+	
+	return ts_source
+	
 
 ## simple function that automatically create the tiles in the atlas
 func create_tiles(atlas : TileSetAtlasSource) -> void:
 	var atlas_size = atlas.get_atlas_grid_size()
+	# defining tiles
 	for i in range(atlas_size.x):
 		for j in range(atlas_size.y):
 			atlas.create_tile(Vector2i(i,j))
+			
+	# creating alt tiles in tile set
+	# creating normal tile alt
+	atlas.create_alternative_tile(FULL, alt_tiles.NORMAL)
+	# creating horizontal flip
+	atlas.create_alternative_tile(FULL, alt_tiles.FLIP_H)
+	atlas.get_tile_data(FULL, alt_tiles.FLIP_H).flip_h = true
+	#creating vertical flip
+	atlas.create_alternative_tile(FULL, alt_tiles.FLIP_V)
+	atlas.get_tile_data(FULL, alt_tiles.FLIP_H).flip_v = true
+	# creating both vertical and horizontal flip
+	atlas.create_alternative_tile(FULL, alt_tiles.FLIP_HV)
+	atlas.get_tile_data(FULL, alt_tiles.FLIP_HV).flip_v = true
+	atlas.get_tile_data(FULL, alt_tiles.FLIP_HV).flip_h = true
 
 func get_coords_from_chunk(chunk_coord : Vector2i,
 			chunk_size : Vector2i, 
@@ -65,15 +109,13 @@ func _paint_chunk(chunk : ChunkDrawer) -> void:
 	var tile_data : TileData
 	for i in HeightChunk.CHUNK_SIZE.x:
 		for j in HeightChunk.CHUNK_SIZE.y:
+			var coord = get_coords_from_chunk(chunk.chunk_coord,HeightChunk.CHUNK_SIZE,i,j)
 			var height_data = height_chunk.grid[i][j]
 			if height_data < 0:
-				chunk.set_cell(get_coords_from_chunk(chunk.chunk_coord,HeightChunk.CHUNK_SIZE,i,j),
-						 main_source_id,
-						 DEFAULT_TILE)
+				chunk.set_cell(coord, grass_to_water_id, FULL_ALT)
 			else:
-				chunk.set_cell(get_coords_from_chunk(chunk.chunk_coord,HeightChunk.CHUNK_SIZE,i,j),
-						 main_source_id,
-						 SECOND_TILE)
+				var alt_tile = randi() % alt_tiles.size()
+				chunk.set_cell(coord, grass_to_water_id, FULL, alt_tile)
 			
 ## Draws the passed chunk onto the tilemap
 func draw_chunk(chunk_coord : Vector2i) -> void:
@@ -87,7 +129,6 @@ func draw_chunk(chunk_coord : Vector2i) -> void:
 		var thread = Thread.new()
 		thread.start(_bg_chunk_load.bind(chunk_coord, thread))
 	
-
 func _bg_chunk_load(chunk_coord : Vector2i, thread : Thread):
 	var chunk = _create_chunk_tilemap(chunk_coord)
 	_paint_chunk(chunk)
