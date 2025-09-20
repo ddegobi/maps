@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://cmj3k53qx5ap4"]
+
+[ext_resource type="Texture2D" uid="uid://bvp67wpbdrjbr" path="res://textures/structure/tree.png" id="1_4ovqo"]
+
+[node name="maple_tree" type="Area2D"]
+z_index = 1
+input_pickable = false
+
+[node name="Tree" type="Sprite2D" parent="."]
+position = Vector2(0, -12)
+texture = ExtResource("1_4ovqo")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+position = Vector2(0, 2)
+polygon = PackedVector2Array(-3, -3, 3, -3, 3, 2, -3, 2)

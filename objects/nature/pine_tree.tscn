@@ -1,0 +1,47 @@
+[gd_scene load_steps=8 format=3 uid="uid://ghne0ftb43ir"]
+
+[ext_resource type="Script" path="res://objects/nature/pine_tree.gd" id="1_5s6b3"]
+[ext_resource type="Texture2D" uid="uid://bw3gl36iwia4" path="res://objects/nature/tree_anim1.png" id="1_rnhx5"]
+[ext_resource type="Texture2D" uid="uid://f4w0t2swn03t" path="res://objects/nature/tree_anim2.png" id="2_ri64f"]
+[ext_resource type="Texture2D" uid="uid://dhpo1qpx1uby3" path="res://objects/nature/tree_anim3.png" id="3_yjo6l"]
+[ext_resource type="Texture2D" uid="uid://bluhaa6t5pvqp" path="res://objects/nature/tree_anim4.png" id="4_61jk4"]
+[ext_resource type="Texture2D" uid="uid://dkxbl72fxuba2" path="res://objects/nature/tree_anim5.png" id="5_7on8c"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_tf6un"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_rnhx5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_ri64f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_yjo6l")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_61jk4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_7on8c")
+}],
+"loop": true,
+"name": &"default",
+"speed": 3.0
+}]
+
+[node name="pine_tree" type="AnimatableBody2D"]
+y_sort_enabled = true
+position = Vector2(0, -4)
+script = ExtResource("1_5s6b3")
+speed_variance = 3.0
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -5)
+sprite_frames = SubResource("SpriteFrames_tf6un")
+autoplay = "default"
+frame_progress = 0.372653
+offset = Vector2(0, -22)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(-3, -3, 3, -3, 3, 2, -3, 2)

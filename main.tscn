@@ -1,25 +1,73 @@
-[gd_scene load_steps=6 format=3 uid="uid://daepveq8t6sih"]
+[gd_scene load_steps=14 format=4 uid="uid://daepveq8t6sih"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_3lkgc"]
 [ext_resource type="Script" path="res://layer_holder.gd" id="2_lkowl"]
+[ext_resource type="Script" path="res://generation/map_processes/demo/demo_map_drawer.gd" id="3_67rwd"]
+[ext_resource type="Texture2D" uid="uid://cwcu6hq8ijade" path="res://textures/structure/tree_ts.png" id="4_j207n"]
+[ext_resource type="Script" path="res://generation/map_processes/demo/demo_object_drawer.gd" id="4_odq4u"]
 [ext_resource type="Texture2D" uid="uid://bol6j1rh322bw" path="res://interface/icon/map_generator_tileset_icon.png" id="6_okh20"]
 [ext_resource type="Script" path="res://dummy_character.gd" id="6_wseib"]
+[ext_resource type="Script" path="res://generation/map_processes/demo/demo_map_generator.gd" id="7_6fset"]
+[ext_resource type="PackedScene" uid="uid://ghne0ftb43ir" path="res://objects/nature/pine_tree.tscn" id="7_wkuv7"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_isoq4"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ytxvm"]
+texture = ExtResource("4_j207n")
+texture_region_size = Vector2i(8, 8)
+0:0/size_in_atlas = Vector2i(2, 4)
+0:0/0 = 0
+0:0/0/texture_origin = Vector2i(0, 12)
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-2, 0, 2, 0, 4, 4, -4, 4)
+2:0/size_in_atlas = Vector2i(4, 4)
+2:0/0 = 0
+2:0/0/texture_origin = Vector2i(0, 12)
+2:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-4, 4, -2, 0, 0, 0, 4, 4)
+
+[sub_resource type="TileSetScenesCollectionSource" id="TileSetScenesCollectionSource_wly3v"]
+resource_name = "nature"
+scenes/3/scene = ExtResource("7_wkuv7")
+
+[sub_resource type="TileSet" id="TileSet_40ke2"]
+tile_size = Vector2i(8, 8)
+physics_layer_0/collision_layer = 1
+sources/1 = SubResource("TileSetAtlasSource_ytxvm")
+sources/2 = SubResource("TileSetScenesCollectionSource_wly3v")
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_x4ocj"]
+radius = 5.0
+height = 10.0
 
 [node name="main" type="Node2D"]
+z_index = 1
+y_sort_enabled = true
 script = ExtResource("1_3lkgc")
 
 [node name="layer_holder" type="Node2D" parent="."]
+y_sort_enabled = true
 script = ExtResource("2_lkowl")
 
+[node name="base_layer" type="TileMapLayer" parent="layer_holder"]
+z_as_relative = false
+script = ExtResource("3_67rwd")
+
+[node name="object_layer" type="TileMapLayer" parent="layer_holder"]
+y_sort_enabled = true
+tile_map_data = PackedByteArray("AAD6//7/AgAAAAAAAwD4/wUAAgAAAAAAAwDx//n/AgAAAAAAAwDR/wIAAgAAAAAAAwDb/+v/AgAAAAAAAwDJ/+T/AgAAAAAAAwDb//f/AgAAAAAAAwDp/+b/AgAAAAAAAwDQ/+z/AgAAAAAAAwDP/+z/AgAAAAAAAwDX/+z/AgAAAAAAAwDZ/+3/AgAAAAAAAwDv/wkAAgAAAAAAAwD4/xIAAgAAAAAAAwDt/xgAAgAAAAAAAwD3/x4AAgAAAAAAAwA=")
+tile_set = SubResource("TileSet_40ke2")
+script = ExtResource("4_odq4u")
+
+[node name="map_generator" type="Node" parent="layer_holder"]
+script = ExtResource("7_6fset")
+
 [node name="dummy_character" type="CharacterBody2D" parent="."]
+y_sort_enabled = true
 script = ExtResource("6_wseib")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="dummy_character"]
-shape = SubResource("CircleShape2D_isoq4")
+position = Vector2(0, 4)
+shape = SubResource("CapsuleShape2D_x4ocj")
 
 [node name="Sprite2D" type="Sprite2D" parent="dummy_character"]
+y_sort_enabled = true
 texture = ExtResource("6_okh20")
 
 [node name="camera" type="Camera2D" parent="dummy_character"]

@@ -1,17 +1,19 @@
 @icon("res://interface/icon/draw_handler.png")
 class_name ProxDrawHandler extends DrawHandler
 
-const MAX_DISTANCE : int = 10
+const MAX_DISTANCE : int = 12
 const NUMBER_OF_CHUNKS_DRAWN : int = 3
 
 # if im making a loaded_chunks we need a way to periodically pop from stack
 var loaded_chunks = {}
-# Priority queue with priority being the proximity to the player
+# Priority queue with priority being the proximity to the player when the chunk
+# was called to be drawn
 var chunk_queue = []
 var player : CharacterBody2D
+
 # idk i put these here because they are constantly used by the functions, it 
 # wouldn't make sense for it to be allocated and freed up hundreds of times, at
-# least i think?
+# least i think? maybe premature optimization
 var pos : Vector2
 var pos_in_chunk_layer : Vector2i
 var idx_cq : int
@@ -24,7 +26,7 @@ func init_chunk_queue() -> void:
 	find_positions()
 	chunk_queue.append(ChunkPos.new(Vector2i(0,0), 0))
 
-func _init(d_layer : MapDrawer, 
+func _init(d_layer : Drawer, 
 		   c_layer : TileMapLayer, 
 		   curr_player : CharacterBody2D
 		   ) -> void:
@@ -33,10 +35,16 @@ func _init(d_layer : MapDrawer,
 	init_chunk_queue()
 
 func _process(_delta: float) -> void:
-	if chunk_queue.size() > NUMBER_OF_CHUNKS_DRAWN:
+	var chunk_q_size = chunk_queue.size()
+	if chunk_q_size > NUMBER_OF_CHUNKS_DRAWN:
 		for popped_chunk in chunk_queue.slice(-NUMBER_OF_CHUNKS_DRAWN,-1):
 			draw_layer.draw_chunk(popped_chunk.pos)
 		chunk_queue.resize(chunk_queue.size()-NUMBER_OF_CHUNKS_DRAWN)
+	elif chunk_q_size > 0:
+		for popped_chunk in chunk_queue:
+			draw_layer.draw_chunk(popped_chunk.pos)
+		chunk_queue.clear()
+		
 
 ## looks for chunk that need loading near the player
 func look_for_chunks() -> void:
@@ -77,11 +85,6 @@ func is_chunk_not_generated(chunk : ChunkPos) -> bool:
 ## adds the [ChunkPos] object to chunk_queue if the element is not already
 ## present in it
 func add_to_chunk_queue(chunk : ChunkPos) -> void:
-	#print_rich("[color=RED]count is ",chunk_queue.size())
 	idx_cq = chunk_queue.bsearch_custom(chunk, sort_by_distance, true)
-	#print_rich("[color=YELLOW]index is ", idx_cq)
-	#print(chunk_queue)
-	#print(chunk, " == ", chunk_queue[idx_cq-1])
 	if is_chunk_not_generated(chunk) and is_forward_equal_recursive(idx_cq, chunk):
 		chunk_queue.insert(idx_cq, chunk)
-		#print("inserted chunk: %s" % [chunk])

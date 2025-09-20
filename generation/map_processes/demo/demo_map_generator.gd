@@ -1,14 +1,16 @@
 @icon("res://interface/icon/map_generator_tileset_icon.png")
 class_name DemoMapGenerator extends MapGenerator
 
+@export var temp_seed = 7
+
 var noise = FastNoiseLite.new()
 var base = HeightChunk.new()
 
-func _init(seed_int) -> void:
+func _init() -> void:
 	noise.noise_type = FastNoiseLite.NoiseType.TYPE_SIMPLEX_SMOOTH
-	noise.seed = seed_int
+	noise.seed = temp_seed
 	noise.fractal_octaves = 4
-	noise.frequency = 1.0 / 4.0
+	noise.frequency = 1.0 / 20.0
 	
 	for i in HeightChunk.CHUNK_SIZE.x:
 		for j in HeightChunk.CHUNK_SIZE.y:

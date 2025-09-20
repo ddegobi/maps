@@ -1,5 +1,5 @@
 @icon("res://interface/icon/map_generator_tileset_icon.png")
-class_name MapGenerator extends Node
+class_name MapGenerator extends Generator
 
 ## Abstract Class used to Describe a generic map generator. 
 ## Heights ...

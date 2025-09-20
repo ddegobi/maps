@@ -4,10 +4,11 @@ class_name DrawHandler extends Node
 @export_range(0, 1, 0.05, "suffix:s", "or_greater")
 var chunk_check_delay : float = 0.1
 var chunk_check_timer = Timer.new()
-var draw_layer : MapDrawer
+var draw_layer : Drawer
 var chunk_layer : TileMapLayer
+var object_layer : TileMapLayer
 
-func _init(d_layer : MapDrawer, c_layer : TileMapLayer) -> void:
+func _init(d_layer : Drawer, c_layer : TileMapLayer) -> void:
 	draw_layer = d_layer
 	chunk_layer = c_layer
 	
