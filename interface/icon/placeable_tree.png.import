@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://h03nh6i0cipo"
-path="res://.godot/imported/place_holder.png-78e60a6f4995c7091fb962a11850e0a6.ctex"
+uid="uid://3ywlxahidt28"
+path="res://.godot/imported/placeable_tree.png-77e9454d48a74133671d9abf378ba3c0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://textures/structure/place_holder.png"
-dest_files=["res://.godot/imported/place_holder.png-78e60a6f4995c7091fb962a11850e0a6.ctex"]
+source_file="res://interface/icon/placeable_tree.png"
+dest_files=["res://.godot/imported/placeable_tree.png-77e9454d48a74133671d9abf378ba3c0.ctex"]
 
 [params]
 

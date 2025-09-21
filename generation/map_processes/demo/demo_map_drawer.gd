@@ -1,10 +1,21 @@
-@icon("res://interface/icon/map_drawer_icon.png")
+@icon("res://interface/icon/map_drawer.png")
 class_name DemoMapDrawer extends Drawer
 
 ## draws the map throught chunks, everychunk is a different [TileMapLayer]
 
+# alternative tiles IDs
+enum alt_tiles {
+	NORMAL = 0,
+	FLIP_H = 1,
+	FLIP_V = 2,
+	FLIP_HV = 3,
+}
+enum cell_types {
+	GRASS,
+	WATER,
+}
+
 # grass_tileset
-const GRASS_TILESET = preload("res://textures/tilesets/grass_tileset.png")
 # tileset size
 const TILESET_SIZE : Vector2i = Vector2i(8,8)
 # position of defualt tiles
@@ -21,17 +32,7 @@ const OUTER_LEFT = Vector2i(0, 1)
 const OUTER_RIGHT = Vector2i(2, 1)
 const FULL = Vector2i(1,1)
 const FULL_ALT = Vector2i(5,0)
-# alternative tiles IDs
-enum alt_tiles {
-	NORMAL = 0,
-	FLIP_H = 1,
-	FLIP_V = 2,
-	FLIP_HV = 3,
-}
-enum cell_types {
-	GRASS,
-	WATER,
-}
+
 # im sorry to myself if i don't know what this means in like a year or something
 ## Lookup table:[br]
 ## key: 4 characters corrisponding to top-left-right-bottom positions around a
@@ -57,9 +58,10 @@ var atlas_coord_map = {
 	"1111" : FULL_ALT,
 }
 
+var tileset : TileSet = get_tile_set()
+
 # ids of different atlas #######################################################
-var default_source_id : int
-var grass_to_water_id : int
+var grass_to_water_id : int = 0
 ## [MapGenerator] object that is going to be utilized by drawer
 var map_generator : MapGenerator
 
@@ -70,36 +72,13 @@ func _init() -> void:
 	ts.tile_size = TILESET_SIZE
 	ts.add_physics_layer()
 	z_index = -1
-	
-	# basic_tileset.png ADDED
-	#default_source_id = ts.add_source(create_atlas(default_tileset_texture))
-	#print(default_source_id)
-	# grass_tileset.png ADDED
-	create_atlas(GRASS_TILESET, ts)
-	
-	set_tile_set(ts)
+	print(grass_to_water_id)
 
-func _init_atlas_coord_map() -> void:
-	pass
-
-func create_atlas(texture, ts) -> TileSetAtlasSource:
-	var ts_source : TileSetAtlasSource = TileSetAtlasSource.new()
-	ts_source.texture = texture
-	ts_source.texture_region_size = TILESET_SIZE
-	ts.add_source(ts_source)
-	create_tiles(ts_source)
-	
-	return ts_source
-	
+func _ready() -> void:
+	create_tiles(tileset.get_source(grass_to_water_id))
 
 ## simple function that automatically create the tiles in the atlas
 func create_tiles(atlas : TileSetAtlasSource) -> void:
-	var atlas_size = atlas.get_atlas_grid_size()
-	# defining tiles
-	for i in range(atlas_size.x):
-		for j in range(atlas_size.y):
-			atlas.create_tile(Vector2i(i,j))
-			
 	# creating alt tiles in tile set
 	# creating horizontal flip
 	atlas.create_alternative_tile(FULL, alt_tiles.FLIP_H)
@@ -111,18 +90,6 @@ func create_tiles(atlas : TileSetAtlasSource) -> void:
 	atlas.create_alternative_tile(FULL, alt_tiles.FLIP_HV)
 	atlas.get_tile_data(FULL, alt_tiles.FLIP_HV).flip_v = true
 	atlas.get_tile_data(FULL, alt_tiles.FLIP_HV).flip_h = true
-	
-	var water_tile = atlas.get_tile_data(FULL_ALT, 0)
-	
-	water_tile.add_collision_polygon(0)
-	water_tile.set_collision_polygons_count(0,4)
-	water_tile.set_collision_polygon_points(0,0,
-			PackedVector2Array([
-					Vector2(-4,-4),
-					Vector2(-4,4),
-					Vector2(4,4),
-					Vector2(4,-4),
-			]))
 
 
 func get_coords_from_chunk(chunk_coord : Vector2i,

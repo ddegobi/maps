@@ -1,4 +1,4 @@
-@icon("res://interface/icon/map_drawer_icon.png")
+@icon("res://interface/icon/drawer.png")
 class_name Drawer extends TileMapLayer
 
 # abstract

@@ -8,20 +8,16 @@ const BASIC_TILESET = preload("res://basic_tileset.png")
 ## current character being played
 var curr_character : CharacterBody2D
 @export var default_layer : Drawer
+@export var object_layer : Drawer
+@export var generator : Generator
 var default_chunk_layer : TileMapLayer
-var object_layer : TileMapLayer
 var draw_handler : DrawHandler
-var generator
 
 ## If signal is emmitted, parent node will give layer_holder the character's node the player is
 ## currently using. [br]
 signal get_curr_character
 
 func _ready() -> void:
-	generator = get_node("map_generator")
-	default_layer = get_node("base_layer")
-	object_layer = get_node("object_layer")
-	
 	default_layer.map_generator = generator
 	default_chunk_layer = TileMapLayer.new()
 	

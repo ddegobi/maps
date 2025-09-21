@@ -1,26 +1,19 @@
-[gd_scene load_steps=14 format=4 uid="uid://daepveq8t6sih"]
+[gd_scene load_steps=15 format=4 uid="uid://daepveq8t6sih"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_3lkgc"]
 [ext_resource type="Script" path="res://layer_holder.gd" id="2_lkowl"]
+[ext_resource type="TileSet" uid="uid://dkg42tgfa5t8a" path="res://base_layer_tileset.tres" id="3_5sehx"]
 [ext_resource type="Script" path="res://generation/map_processes/demo/demo_map_drawer.gd" id="3_67rwd"]
-[ext_resource type="Texture2D" uid="uid://cwcu6hq8ijade" path="res://textures/structure/tree_ts.png" id="4_j207n"]
+[ext_resource type="PackedScene" uid="uid://uh7ippr43y66" path="res://objects/buildings/house1.tscn" id="4_fd1dn"]
 [ext_resource type="Script" path="res://generation/map_processes/demo/demo_object_drawer.gd" id="4_odq4u"]
 [ext_resource type="Texture2D" uid="uid://bol6j1rh322bw" path="res://interface/icon/map_generator_tileset_icon.png" id="6_okh20"]
 [ext_resource type="Script" path="res://dummy_character.gd" id="6_wseib"]
 [ext_resource type="Script" path="res://generation/map_processes/demo/demo_map_generator.gd" id="7_6fset"]
-[ext_resource type="PackedScene" uid="uid://ghne0ftb43ir" path="res://objects/nature/pine_tree.tscn" id="7_wkuv7"]
+[ext_resource type="PackedScene" uid="uid://ghne0ftb43ir" path="res://objects/nature/maple_tree.tscn" id="7_wkuv7"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ytxvm"]
-texture = ExtResource("4_j207n")
-texture_region_size = Vector2i(8, 8)
-0:0/size_in_atlas = Vector2i(2, 4)
-0:0/0 = 0
-0:0/0/texture_origin = Vector2i(0, 12)
-0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-2, 0, 2, 0, 4, 4, -4, 4)
-2:0/size_in_atlas = Vector2i(4, 4)
-2:0/0 = 0
-2:0/0/texture_origin = Vector2i(0, 12)
-2:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-4, 4, -2, 0, 0, 0, 4, 4)
+[sub_resource type="TileSetScenesCollectionSource" id="TileSetScenesCollectionSource_7q36m"]
+resource_name = "building"
+scenes/1/scene = ExtResource("4_fd1dn")
 
 [sub_resource type="TileSetScenesCollectionSource" id="TileSetScenesCollectionSource_wly3v"]
 resource_name = "nature"
@@ -29,8 +22,8 @@ scenes/3/scene = ExtResource("7_wkuv7")
 [sub_resource type="TileSet" id="TileSet_40ke2"]
 tile_size = Vector2i(8, 8)
 physics_layer_0/collision_layer = 1
-sources/1 = SubResource("TileSetAtlasSource_ytxvm")
 sources/2 = SubResource("TileSetScenesCollectionSource_wly3v")
+sources/0 = SubResource("TileSetScenesCollectionSource_7q36m")
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_x4ocj"]
 radius = 5.0
@@ -41,17 +34,21 @@ z_index = 1
 y_sort_enabled = true
 script = ExtResource("1_3lkgc")
 
-[node name="layer_holder" type="Node2D" parent="."]
+[node name="layer_holder" type="Node2D" parent="." node_paths=PackedStringArray("default_layer", "object_layer", "generator")]
 y_sort_enabled = true
 script = ExtResource("2_lkowl")
+default_layer = NodePath("base_layer")
+object_layer = NodePath("object_layer")
+generator = NodePath("map_generator")
 
 [node name="base_layer" type="TileMapLayer" parent="layer_holder"]
 z_as_relative = false
+tile_set = ExtResource("3_5sehx")
 script = ExtResource("3_67rwd")
 
 [node name="object_layer" type="TileMapLayer" parent="layer_holder"]
 y_sort_enabled = true
-tile_map_data = PackedByteArray("AAD6//7/AgAAAAAAAwD4/wUAAgAAAAAAAwDx//n/AgAAAAAAAwDR/wIAAgAAAAAAAwDb/+v/AgAAAAAAAwDJ/+T/AgAAAAAAAwDb//f/AgAAAAAAAwDp/+b/AgAAAAAAAwDQ/+z/AgAAAAAAAwDP/+z/AgAAAAAAAwDX/+z/AgAAAAAAAwDZ/+3/AgAAAAAAAwDv/wkAAgAAAAAAAwD4/xIAAgAAAAAAAwDt/xgAAgAAAAAAAwD3/x4AAgAAAAAAAwA=")
+tile_map_data = PackedByteArray("AAD6//7/AgAAAAAAAwDx//n/AgAAAAAAAwDR/wIAAgAAAAAAAwDb/+v/AgAAAAAAAwDJ/+T/AgAAAAAAAwDb//f/AgAAAAAAAwDp/+b/AgAAAAAAAwDP/+z/AgAAAAAAAwDX/+z/AgAAAAAAAwDZ/+3/AgAAAAAAAwDv/wkAAgAAAAAAAwD4/xIAAgAAAAAAAwDt/xgAAgAAAAAAAwD3/x4AAgAAAAAAAwD3/wQAAgAAAAAAAwDl//z/AgAAAAAAAwDh////AgAAAAAAAwDl/wAAAgAAAAAAAwDp//7/AgAAAAAAAwDS/+//AgAAAAAAAwDq//L/AAAAAAAAAQA=")
 tile_set = SubResource("TileSet_40ke2")
 script = ExtResource("4_odq4u")
 
@@ -63,12 +60,13 @@ y_sort_enabled = true
 script = ExtResource("6_wseib")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="dummy_character"]
-position = Vector2(0, 4)
+position = Vector2(0, -4)
 shape = SubResource("CapsuleShape2D_x4ocj")
 
 [node name="Sprite2D" type="Sprite2D" parent="dummy_character"]
 y_sort_enabled = true
 texture = ExtResource("6_okh20")
+offset = Vector2(0, -7)
 
 [node name="camera" type="Camera2D" parent="dummy_character"]
 zoom = Vector2(2, 2)
