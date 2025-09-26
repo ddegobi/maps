@@ -1,5 +1,4 @@
-class_name LayerHolder extends Node2D
-@onready var main_camera: Camera2D = $"../dummy_character/camera"
+extends Node2D
 
 const MAIN_SOURCE_ID = 0
 const PURPLE_TILE_ID = Vector2i(0,0)

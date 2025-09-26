@@ -1,0 +1,36 @@
+[gd_scene load_steps=8 format=3 uid="uid://451tbikya152"]
+
+[ext_resource type="Script" path="res://generation/drawing/drawer_state_machine.gd" id="1_0gu2x"]
+[ext_resource type="Script" path="res://generation/drawing/states/height_map_drawer.gd" id="2_cki8n"]
+[ext_resource type="Script" path="res://generation/drawing/states/land_drawer.gd" id="3_lnksv"]
+[ext_resource type="Script" path="res://generation/drawing/states/biome_drawer.gd" id="4_31pn2"]
+[ext_resource type="Script" path="res://generation/drawing/states/river_drawer.gd" id="5_8vq3b"]
+[ext_resource type="Script" path="res://generation/drawing/states/terrain_tile_drawer.gd" id="6_a6d88"]
+[ext_resource type="Script" path="res://generation/drawing/states/end_state.gd" id="7_kxa2g"]
+
+[node name="DrawerStateMachine" type="Node"]
+script = ExtResource("1_0gu2x")
+
+[node name="HeightMapDrawer" type="Node" parent="."]
+script = ExtResource("2_cki8n")
+default_next_state = "TerrainTileDrawer"
+
+[node name="LandDrawer" type="Node" parent="."]
+script = ExtResource("3_lnksv")
+default_next_state = "BiomeDrawer"
+
+[node name="BiomeDrawer" type="Node" parent="."]
+script = ExtResource("4_31pn2")
+default_next_state = "RiverDrawer"
+
+[node name="RiverDrawer" type="Node" parent="."]
+script = ExtResource("5_8vq3b")
+default_next_state = "TerrainTileDrawer"
+
+[node name="TerrainTileDrawer" type="Node" parent="."]
+script = ExtResource("6_a6d88")
+default_next_state = "EndState"
+
+[node name="EndState" type="Node" parent="."]
+script = ExtResource("7_kxa2g")
+default_next_state = "EndState"

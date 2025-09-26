@@ -3,6 +3,8 @@ class_name ChunkPos
 var pos : Vector2i
 var dist : float 
 
+## objects used by [ProxDrawHandler] to index the chunks.
+
 func _init(position, distance) -> void:
 	pos = position
 	dist = distance

@@ -1,5 +1,13 @@
 @icon("res://interface/icon/draw_handler.png")
-class_name ProxDrawHandler extends DrawHandler
+class_name ProximityDrawHandler extends Node
+
+signal get_curr_character
+
+@export_range(0, 1, 0.05, "suffix:s", "or_greater")
+var chunk_check_delay : float = 0.1
+var chunk_check_timer = Timer.new()
+var layer_holder : LayerHolder = null
+var chunk_layer : TileMapLayer = null
 
 ## Class handles what chunks are to be drawn and which chunks are to be wiped.
 ## In particular, ProxDrawHandler makes this choice based on the position of the
@@ -28,26 +36,22 @@ func find_positions() -> void:
 	pos_in_chunk_layer = chunk_layer.local_to_map(pos)
 
 func init_chunk_queue() -> void:
-	find_positions()
 	chunk_queue.append(ChunkPos.new(Vector2i(0,0), 0))
 
-func _init(d_layer : Drawer, 
-		   c_layer : TileMapLayer, 
-		   curr_player : CharacterBody2D
-		   ) -> void:
-	super(d_layer, c_layer)
-	player = curr_player
+func _init() -> void:
 	init_chunk_queue()
-
+	
 func _process(_delta: float) -> void:
 	var chunk_q_size = chunk_queue.size()
 	if chunk_q_size > NUMBER_OF_CHUNKS_DRAWN:
 		for popped_chunk in chunk_queue.slice(-NUMBER_OF_CHUNKS_DRAWN,-1):
-			draw_layer.draw_chunk(popped_chunk.pos)
+			layer_holder.draw_chunk(popped_chunk.pos)
+			loaded_chunks[popped_chunk.pos] = popped_chunk
 		chunk_queue.resize(chunk_queue.size()-NUMBER_OF_CHUNKS_DRAWN)
 	elif chunk_q_size > 0:
 		for popped_chunk in chunk_queue:
-			draw_layer.draw_chunk(popped_chunk.pos)
+			layer_holder.draw_chunk(popped_chunk.pos)
+			loaded_chunks[popped_chunk.pos] = popped_chunk
 		chunk_queue.clear()
 
 ## Function looks for chunks to be added to chunk_queue, gets periodically 
@@ -82,7 +86,7 @@ func is_forward_equal_recursive(index : int, chunk : ChunkPos) -> bool:
 		return true
 
 func is_chunk_not_generated(chunk : ChunkPos) -> bool:
-	return not draw_layer.is_chunk_gen(chunk.pos)
+	return not loaded_chunks.has(chunk.pos)
 
 ## adds the [ChunkPos] object to chunk_queue if the element is not already
 ## present in it
@@ -90,3 +94,21 @@ func add_to_chunk_queue(chunk : ChunkPos) -> void:
 	idx_cq = chunk_queue.bsearch_custom(chunk, sort_by_distance, true)
 	if is_chunk_not_generated(chunk) and is_forward_equal_recursive(idx_cq, chunk):
 		chunk_queue.insert(idx_cq, chunk)
+
+func _ready() -> void:
+	await owner.ready
+	get_curr_character.emit()
+	_init_timer()
+	layer_holder = get_parent().find_children("*", "LayerHolder")[0]
+	chunk_layer = layer_holder.chunk_layer
+	start_chunk_gen()
+	
+	
+func start_chunk_gen() -> void:
+	chunk_check_timer.start()
+	
+func _init_timer() -> void:
+	add_child(chunk_check_timer)
+	chunk_check_timer.wait_time = chunk_check_delay
+	chunk_check_timer.one_shot = false
+	chunk_check_timer.connect("timeout", look_for_chunks)
